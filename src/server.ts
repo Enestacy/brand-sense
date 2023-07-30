@@ -7,11 +7,6 @@ import dotenv from 'dotenv';
 import { Context } from './utils';
 import openaiClient from './utils/openai-client';
 
-// dotenv.config({ path: '.env' });
-app.use(cors({ origin: '*' }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 declare global {
   namespace Express {
     interface Request<TBody = any> {
@@ -21,7 +16,11 @@ declare global {
   }
 }
 
-app.use((req, res, next): void => {
+app.use(cors({ origin: '*' }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
   req.context = {
     openaiClient: openaiClient,
   };
