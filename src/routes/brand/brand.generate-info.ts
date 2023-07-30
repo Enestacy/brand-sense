@@ -2,16 +2,24 @@ import express from 'express';
 const router = express.Router();
 import { JSDOM } from 'jsdom';
 import { Request, Response } from 'express';
-import { PutBrandBody, getBrandDataPrompt } from '../../utils';
+import {
+  InvalidWebsiteDomain,
+  NoWebsiteProvided,
+  PutBrandBody,
+  getBrandDataPrompt,
+} from '../../utils';
 
 router.put(
   '/generate-brand-info',
   async function (req: Request<PutBrandBody>, res: Response) {
     try {
-      const websiteUrl = req.body.websiteUrl;
-      const reqExp = /(?:https?:\/\/)?(?:www\.)?([^\/]+)/;
+      const websiteUrl = req.body?.websiteUrl;
+      if (!websiteUrl) throw NoWebsiteProvided;
 
+      const reqExp = /(?:https?:\/\/)?(?:www\.)?([^\/]+)/;
       const execDomainName = websiteUrl.match(reqExp)[1];
+
+      if (!execDomainName) throw InvalidWebsiteDomain;
 
       const websiteData = {
         images: [],
@@ -52,6 +60,7 @@ router.put(
       const document = dom.window.document;
 
       const metaTags = document.querySelectorAll('meta');
+
       metaTags.forEach((metaTag) => {
         const name = metaTag.getAttribute('name');
         const content = metaTag.getAttribute('content');
@@ -89,12 +98,9 @@ router.put(
 
       const finalData = { ...websiteData, ...parsedData };
 
-      console.log(finalData);
-
       res.send(finalData);
     } catch (error) {
-      console.error(error);
-      return res.status(500).send(error);
+      return res.status(error?.code || 500).send(error.message);
     }
   }
 );
