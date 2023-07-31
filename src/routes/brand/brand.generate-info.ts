@@ -11,7 +11,7 @@ import {
 
 router.put(
   '/generate-brand-info',
-  async function (req: Request<PutBrandBody>, res: Response) {
+  async (req: Request<PutBrandBody>, res: Response) => {
     try {
       const websiteUrl = req.body?.websiteUrl;
       if (!websiteUrl) throw NoWebsiteProvided;
@@ -84,8 +84,7 @@ router.put(
       });
 
       const imagesLink = document.querySelectorAll(
-        'link[rel="icon"], link[rel="shortcut icon"]',
-        'link[rel="apple-touch-icon"]'
+        'link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]'
       );
 
       imagesLink.forEach((metaTag) => {
